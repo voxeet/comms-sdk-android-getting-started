@@ -76,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
+        throw new IllegalStateException("<---- Remove this line and set your keys below to use this sample !!");
         VoxeetSdk.initialize("", "");
 
         //adding the user_name, login and logout views related to the open/close and conference flow
