@@ -138,13 +138,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private ErrorPromise error() {
-        return new ErrorPromise() {
-            @Override
-            public void onError(@NonNull Throwable error) {
-                Toast.makeText(MainActivity.this, "ERROR...", Toast.LENGTH_SHORT).show();
-                error.printStackTrace();
-                updateViews();
-            }
+        return error -> {
+            Toast.makeText(MainActivity.this, "ERROR...", Toast.LENGTH_SHORT).show();
+            error.printStackTrace();
+            updateViews();
         };
     }
 
@@ -174,11 +171,8 @@ public class MainActivity extends AppCompatActivity {
     @OnClick(R.id.join)
     public void onJoin() {
         VoxeetSdk.conference().create(conference_name.getText().toString())
-                .then((PromiseExec<CreateConferenceResult, Conference>) (result, solver) -> {
-                    if (null != result)
-                        solver.resolve(VoxeetSdk.conference().join(result.conferenceId));
-                    else Toast.makeText(MainActivity.this, "Ooops", Toast.LENGTH_SHORT).show();
-                })
+                .then((PromiseExec<CreateConferenceResult, Conference>) (result, solver) ->
+                        solver.resolve(VoxeetSdk.conference().join(result.conferenceId)))
                 .then((result, solver) -> {
                     Toast.makeText(MainActivity.this, "started...", Toast.LENGTH_SHORT).show();
                     updateViews();
