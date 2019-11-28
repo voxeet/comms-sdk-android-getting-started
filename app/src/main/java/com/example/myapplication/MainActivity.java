@@ -94,7 +94,9 @@ public class MainActivity extends AppCompatActivity {
 
         add(buttonsNotInConference, R.id.join);
 
+        add(views, R.id.leave);
 
+        add(buttonsInConference, R.id.leave);
     }
 
     @Override
