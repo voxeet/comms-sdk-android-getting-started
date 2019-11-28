@@ -1,10 +1,5 @@
 package com.example.myapplication;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -12,6 +7,10 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import com.voxeet.android.media.MediaStream;
 import com.voxeet.android.media.MediaStreamType;
@@ -39,7 +38,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import eu.codlab.simplepromise.solve.ErrorPromise;
 import eu.codlab.simplepromise.solve.PromiseExec;
-import eu.codlab.simplepromise.solve.Solver;
 
 public class MainActivity extends AppCompatActivity {
     @NonNull
@@ -157,12 +155,9 @@ public class MainActivity extends AppCompatActivity {
     @OnClick(R.id.login)
     public void onLogin() {
         VoxeetSdk.session().open(new UserInfo(user_name.getText().toString(), "", ""))
-                .then(new PromiseExec<Boolean, Object>() {
-                    @Override
-                    public void onCall(@Nullable Boolean result, @NonNull Solver<Object> solver) {
-                        Toast.makeText(MainActivity.this, "started...", Toast.LENGTH_SHORT).show();
-                        updateViews();
-                    }
+                .then((result, solver) -> {
+                    Toast.makeText(MainActivity.this, "started...", Toast.LENGTH_SHORT).show();
+                    updateViews();
                 })
                 .error(error());
     }
@@ -170,32 +165,23 @@ public class MainActivity extends AppCompatActivity {
     @OnClick(R.id.logout)
     public void onLogout() {
         VoxeetSdk.session().close()
-                .then(new PromiseExec<Boolean, Object>() {
-                    @Override
-                    public void onCall(@Nullable Boolean result, @NonNull Solver<Object> solver) {
-                        Toast.makeText(MainActivity.this, "logout done", Toast.LENGTH_SHORT).show();
-                        updateViews();
-                    }
+                .then((result, solver) -> {
+                    Toast.makeText(MainActivity.this, "logout done", Toast.LENGTH_SHORT).show();
+                    updateViews();
                 }).error(error());
     }
 
     @OnClick(R.id.join)
     public void onJoin() {
         VoxeetSdk.conference().create(conference_name.getText().toString())
-                .then(new PromiseExec<CreateConferenceResult, Conference>() {
-                    @Override
-                    public void onCall(@Nullable CreateConferenceResult result, @NonNull Solver<Conference> solver) {
-                        if (null != result)
-                            solver.resolve(VoxeetSdk.conference().join(result.conferenceId));
-                        else Toast.makeText(MainActivity.this, "Ooops", Toast.LENGTH_SHORT).show();
-                    }
+                .then((PromiseExec<CreateConferenceResult, Conference>) (result, solver) -> {
+                    if (null != result)
+                        solver.resolve(VoxeetSdk.conference().join(result.conferenceId));
+                    else Toast.makeText(MainActivity.this, "Ooops", Toast.LENGTH_SHORT).show();
                 })
-                .then(new PromiseExec<Conference, Object>() {
-                    @Override
-                    public void onCall(@Nullable Conference result, @NonNull Solver<Object> solver) {
-                        Toast.makeText(MainActivity.this, "started...", Toast.LENGTH_SHORT).show();
-                        updateViews();
-                    }
+                .then((result, solver) -> {
+                    Toast.makeText(MainActivity.this, "started...", Toast.LENGTH_SHORT).show();
+                    updateViews();
                 })
                 .error(error());
     }
@@ -203,35 +189,20 @@ public class MainActivity extends AppCompatActivity {
     @OnClick(R.id.leave)
     public void onLeave() {
         VoxeetSdk.conference().leave()
-                .then(new PromiseExec<Boolean, Object>() {
-                    @Override
-                    public void onCall(@Nullable Boolean result, @NonNull Solver<Object> solver) {
-                        updateViews();
-                    }
-                }).error(error());
+                .then((result, solver) -> updateViews()).error(error());
     }
 
     @OnClick(R.id.startVideo)
     public void onStartVideo() {
         VoxeetSdk.conference().startVideo()
-                .then(new PromiseExec<Boolean, Object>() {
-                    @Override
-                    public void onCall(Boolean result, Solver<Object> solver) {
-                        updateViews();
-                    }
-                })
+                .then((result, solver) -> updateViews())
                 .error(error());
     }
 
     @OnClick(R.id.stopVideo)
     public void onStopVideo() {
         VoxeetSdk.conference().stopVideo()
-                .then(new PromiseExec<Boolean, Object>() {
-                    @Override
-                    public void onCall(Boolean result, Solver<Object> solver) {
-                        updateViews();
-                    }
-                })
+                .then((result, solver) -> updateViews())
                 .error(error());
     }
 
