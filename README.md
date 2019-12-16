@@ -1,3 +1,8 @@
-# Voxeet Sdk Android Getting Started
+# Getting Started with VoxeetSDK on Android
 
-Sample code for the documentation found at https://developer.voxeet.com/getstarted/android/getstarted-Android/
+This repository has the sample code explained in this guide:
+- [Create a Basic Audio Conference Application](https://www.voxeet.com/documentation/sdk/samples/basic-audio-conference)
+
+You can find additional reference documentation here:
+- [Android Reference](https://www.voxeet.com/documentation/sdk/reference/android/voxeetsdk)
+
