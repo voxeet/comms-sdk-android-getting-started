@@ -14,15 +14,20 @@ import androidx.core.app.ActivityCompat;
 
 import com.voxeet.android.media.MediaStream;
 import com.voxeet.android.media.MediaStreamType;
+import com.voxeet.promise.Promise;
+import com.voxeet.promise.solve.ErrorPromise;
+import com.voxeet.promise.solve.ThenPromise;
+import com.voxeet.promise.solve.ThenValue;
+import com.voxeet.promise.solve.ThenVoid;
 import com.voxeet.sdk.VoxeetSdk;
+import com.voxeet.sdk.events.v2.ParticipantAddedEvent;
+import com.voxeet.sdk.events.v2.ParticipantUpdatedEvent;
 import com.voxeet.sdk.events.v2.StreamAddedEvent;
 import com.voxeet.sdk.events.v2.StreamRemovedEvent;
 import com.voxeet.sdk.events.v2.StreamUpdatedEvent;
-import com.voxeet.sdk.events.v2.UserAddedEvent;
-import com.voxeet.sdk.events.v2.UserUpdatedEvent;
-import com.voxeet.sdk.json.UserInfo;
+import com.voxeet.sdk.json.ParticipantInfo;
 import com.voxeet.sdk.models.Conference;
-import com.voxeet.sdk.models.User;
+import com.voxeet.sdk.models.Participant;
 import com.voxeet.sdk.models.v1.CreateConferenceResult;
 import com.voxeet.sdk.services.conference.information.ConferenceInformation;
 import com.voxeet.sdk.views.VideoView;
@@ -36,8 +41,6 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import eu.codlab.simplepromise.solve.ErrorPromise;
-import eu.codlab.simplepromise.solve.PromiseExec;
 
 public class MainActivity extends AppCompatActivity {
     @NonNull
@@ -151,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.login)
     public void onLogin() {
-        VoxeetSdk.session().open(new UserInfo(user_name.getText().toString(), "", ""))
+        VoxeetSdk.session().open(new ParticipantInfo(user_name.getText().toString(), "", ""))
                 .then((result, solver) -> {
                     Toast.makeText(MainActivity.this, "started...", Toast.LENGTH_SHORT).show();
                     updateViews();
@@ -171,9 +174,8 @@ public class MainActivity extends AppCompatActivity {
     @OnClick(R.id.join)
     public void onJoin() {
         VoxeetSdk.conference().create(conference_name.getText().toString())
-                .then((PromiseExec<CreateConferenceResult, Conference>) (result, solver) ->
-                        solver.resolve(VoxeetSdk.conference().join(result.conferenceId)))
-                .then((result, solver) -> {
+                .then((ThenPromise<CreateConferenceResult, Conference>) res -> VoxeetSdk.conference().join(res.conferenceId))
+                .then(conference -> {
                     Toast.makeText(MainActivity.this, "started...", Toast.LENGTH_SHORT).show();
                     updateViews();
                 })
@@ -216,18 +218,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(UserAddedEvent event) {
+    public void onEvent(ParticipantAddedEvent event) {
         updateUsers();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(UserUpdatedEvent event) {
+    public void onEvent(ParticipantUpdatedEvent event) {
         updateUsers();
     }
 
     private void updateStreams() {
-        for (User user : VoxeetSdk.conference().getUsers()) {
-            boolean isLocal = user.getId().equals(VoxeetSdk.session().getUserId());
+        for (Participant user : VoxeetSdk.conference().getParticipants()) {
+            boolean isLocal = user.getId().equals(VoxeetSdk.session().getParticipantId());
             MediaStream stream = user.streamsHandler().getFirst(MediaStreamType.Camera);
 
             VideoView video = isLocal ? this.video : this.videoOther;
@@ -240,12 +242,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void updateUsers() {
-        List<User> participants = VoxeetSdk.conference().getUsers();
+        List<Participant> participants = VoxeetSdk.conference().getParticipants();
         List<String> names = new ArrayList<>();
 
 
-        for (User participant : participants) {
-            names.add(participant.getUserInfo().getName());
+        for (Participant participant : participants) {
+            names.add(participant.getInfo().getName());
         }
 
         this.participants.setText(TextUtils.join(",", names));
