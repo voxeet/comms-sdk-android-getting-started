@@ -12,14 +12,11 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import com.voxeet.VoxeetSDK;
 import com.voxeet.android.media.MediaStream;
 import com.voxeet.android.media.MediaStreamType;
-import com.voxeet.promise.Promise;
 import com.voxeet.promise.solve.ErrorPromise;
 import com.voxeet.promise.solve.ThenPromise;
-import com.voxeet.promise.solve.ThenValue;
-import com.voxeet.promise.solve.ThenVoid;
-import com.voxeet.sdk.VoxeetSdk;
 import com.voxeet.sdk.events.v2.ParticipantAddedEvent;
 import com.voxeet.sdk.events.v2.ParticipantUpdatedEvent;
 import com.voxeet.sdk.events.v2.StreamAddedEvent;
@@ -30,6 +27,8 @@ import com.voxeet.sdk.models.Conference;
 import com.voxeet.sdk.models.Participant;
 import com.voxeet.sdk.models.v1.CreateConferenceResult;
 import com.voxeet.sdk.services.conference.information.ConferenceInformation;
+import com.voxeet.sdk.utils.Map;
+import com.voxeet.sdk.utils.Opt;
 import com.voxeet.sdk.views.VideoView;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -77,8 +76,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        throw new IllegalStateException("<---- Remove this line and set your keys below to use this sample !!");
-        VoxeetSdk.initialize("", "");
+        //throw new IllegalStateException("<---- Remove this line and set your keys below to use this sample !!");
+        VoxeetSDK.initialize("", "");
 
         //adding the user_name, login and logout views related to the open/close and conference flow
         add(views, R.id.login);
@@ -112,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA}, 0x20);
         }
 
-        VoxeetSdk.instance().register(this);
+        VoxeetSDK.instance().register(this);
     }
 
     private MainActivity add(List<View> list, int id) {
@@ -126,14 +125,14 @@ public class MainActivity extends AppCompatActivity {
         setEnabled(views, false);
 
         //if the user is not connected, we will only enabled the not logged
-        if (!VoxeetSdk.session().isSocketOpen()) {
+        if (!VoxeetSDK.session().isSocketOpen()) {
             setEnabled(buttonsNotLoggedIn, true);
             return;
         }
 
-        ConferenceInformation current = VoxeetSdk.conference().getCurrentConference();
+        ConferenceInformation current = VoxeetSDK.conference().getCurrentConference();
         //we can now add the logic to manage our basic state
-        if (null != current && VoxeetSdk.conference().isLive()) {
+        if (null != current && VoxeetSDK.conference().isLive()) {
             setEnabled(buttonsInConference, true);
         } else {
             setEnabled(buttonsNotInConference, true);
@@ -154,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.login)
     public void onLogin() {
-        VoxeetSdk.session().open(new ParticipantInfo(user_name.getText().toString(), "", ""))
+        VoxeetSDK.session().open(new ParticipantInfo(user_name.getText().toString(), "", ""))
                 .then((result, solver) -> {
                     Toast.makeText(MainActivity.this, "started...", Toast.LENGTH_SHORT).show();
                     updateViews();
@@ -164,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.logout)
     public void onLogout() {
-        VoxeetSdk.session().close()
+        VoxeetSDK.session().close()
                 .then((result, solver) -> {
                     Toast.makeText(MainActivity.this, "logout done", Toast.LENGTH_SHORT).show();
                     updateViews();
@@ -173,8 +172,8 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.join)
     public void onJoin() {
-        VoxeetSdk.conference().create(conference_name.getText().toString())
-                .then((ThenPromise<CreateConferenceResult, Conference>) res -> VoxeetSdk.conference().join(res.conferenceId))
+        VoxeetSDK.conference().create(conference_name.getText().toString())
+                .then((ThenPromise<CreateConferenceResult, Conference>) res -> VoxeetSDK.conference().join(res.conferenceId))
                 .then(conference -> {
                     Toast.makeText(MainActivity.this, "started...", Toast.LENGTH_SHORT).show();
                     updateViews();
@@ -184,20 +183,20 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.leave)
     public void onLeave() {
-        VoxeetSdk.conference().leave()
+        VoxeetSDK.conference().leave()
                 .then((result, solver) -> updateViews()).error(error());
     }
 
     @OnClick(R.id.startVideo)
     public void onStartVideo() {
-        VoxeetSdk.conference().startVideo()
+        VoxeetSDK.conference().startVideo()
                 .then((result, solver) -> updateViews())
                 .error(error());
     }
 
     @OnClick(R.id.stopVideo)
     public void onStopVideo() {
-        VoxeetSdk.conference().stopVideo()
+        VoxeetSDK.conference().stopVideo()
                 .then((result, solver) -> updateViews())
                 .error(error());
     }
@@ -228,8 +227,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateStreams() {
-        for (Participant user : VoxeetSdk.conference().getParticipants()) {
-            boolean isLocal = user.getId().equals(VoxeetSdk.session().getParticipantId());
+        for (Participant user : VoxeetSDK.conference().getParticipants()) {
+            boolean isLocal = user.getId().equals(VoxeetSDK.session().getParticipantId());
             MediaStream stream = user.streamsHandler().getFirst(MediaStreamType.Camera);
 
             VideoView video = isLocal ? this.video : this.videoOther;
@@ -242,13 +241,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void updateUsers() {
-        List<Participant> participants = VoxeetSdk.conference().getParticipants();
-        List<String> names = new ArrayList<>();
-
-
-        for (Participant participant : participants) {
-            names.add(participant.getInfo().getName());
-        }
+        List<String> names = Map.map(VoxeetSDK.conference().getParticipants(), participant ->
+                Opt.of(participant.getInfo()).then(ParticipantInfo::getName).or(""));
 
         this.participants.setText(TextUtils.join(",", names));
     }
