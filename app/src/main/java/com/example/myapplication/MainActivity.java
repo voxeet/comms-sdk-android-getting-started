@@ -14,7 +14,7 @@ import androidx.core.app.ActivityCompat;
 
 import com.voxeet.VoxeetSDK;
 import com.voxeet.android.media.MediaStream;
-import com.voxeet.android.media.MediaStreamType;
+import com.voxeet.android.media.stream.MediaStreamType;
 import com.voxeet.promise.solve.ErrorPromise;
 import com.voxeet.promise.solve.ThenPromise;
 import com.voxeet.sdk.events.v2.ParticipantAddedEvent;
@@ -23,9 +23,11 @@ import com.voxeet.sdk.events.v2.StreamAddedEvent;
 import com.voxeet.sdk.events.v2.StreamRemovedEvent;
 import com.voxeet.sdk.events.v2.StreamUpdatedEvent;
 import com.voxeet.sdk.json.ParticipantInfo;
+import com.voxeet.sdk.json.internal.ParamsHolder;
 import com.voxeet.sdk.models.Conference;
 import com.voxeet.sdk.models.Participant;
 import com.voxeet.sdk.models.v1.CreateConferenceResult;
+import com.voxeet.sdk.services.builders.ConferenceCreateOptions;
 import com.voxeet.sdk.services.conference.information.ConferenceInformation;
 import com.voxeet.sdk.utils.Map;
 import com.voxeet.sdk.utils.Opt;
@@ -172,7 +174,14 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.join)
     public void onJoin() {
-        VoxeetSDK.conference().create(conference_name.getText().toString())
+        ParamsHolder paramsHolder = new ParamsHolder();
+
+        ConferenceCreateOptions conferenceCreateOptions = new ConferenceCreateOptions.Builder()
+                .setConferenceAlias(conference_name.getText().toString())
+                .setParamsHolder(paramsHolder)
+                .build();
+
+        VoxeetSDK.conference().create(conferenceCreateOptions)
                 .then((ThenPromise<CreateConferenceResult, Conference>) res -> VoxeetSDK.conference().join(res.conferenceId))
                 .then(conference -> {
                     Toast.makeText(MainActivity.this, "started...", Toast.LENGTH_SHORT).show();
