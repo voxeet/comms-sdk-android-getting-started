@@ -175,6 +175,7 @@ public class MainActivity extends AppCompatActivity {
     @OnClick(R.id.join)
     public void onJoin() {
         ParamsHolder paramsHolder = new ParamsHolder();
+        paramsHolder.setDolbyVoice(true);
 
         ConferenceCreateOptions conferenceCreateOptions = new ConferenceCreateOptions.Builder()
                 .setConferenceAlias(conference_name.getText().toString())
@@ -182,7 +183,10 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
         VoxeetSDK.conference().create(conferenceCreateOptions)
-                .then((ThenPromise<CreateConferenceResult, Conference>) res -> VoxeetSDK.conference().join(res.conferenceId))
+                .then((ThenPromise<CreateConferenceResult, Conference>) res -> {
+                    Conference conference = VoxeetSDK.conference().getConference(res.conferenceId);
+                    return VoxeetSDK.conference().join(conference);
+                })
                 .then(conference -> {
                     Toast.makeText(MainActivity.this, "started...", Toast.LENGTH_SHORT).show();
                     updateViews();

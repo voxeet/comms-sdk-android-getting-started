@@ -18,7 +18,8 @@ allprojects {
     repositories {
         google()
         jcenter()
-        
+
+        maven { url "https://android-sdk.voxeet.com/release" }
     }
 }
 
