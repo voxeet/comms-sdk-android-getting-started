@@ -17,7 +17,7 @@ import com.voxeet.VoxeetSDK;
 import com.voxeet.android.media.MediaStream;
 import com.voxeet.android.media.stream.MediaStreamType;
 import com.voxeet.promise.solve.ErrorPromise;
-import com.voxeet.promise.solve.PromiseExec;
+import com.voxeet.promise.solve.ThenPromise;
 import com.voxeet.sdk.events.v2.ParticipantAddedEvent;
 import com.voxeet.sdk.events.v2.ParticipantUpdatedEvent;
 import com.voxeet.sdk.events.v2.StreamAddedEvent;
@@ -31,7 +31,6 @@ import com.voxeet.sdk.models.Conference;
 import com.voxeet.sdk.models.Participant;
 import com.voxeet.sdk.models.v1.CreateConferenceResult;
 import com.voxeet.sdk.services.builders.ConferenceCreateOptions;
-import com.voxeet.sdk.services.builders.ConferenceJoinOptions;
 import com.voxeet.sdk.services.conference.information.ConferenceInformation;
 import com.voxeet.sdk.services.screenshare.RequestScreenSharePermissionEvent;
 import com.voxeet.sdk.views.VideoView;
@@ -93,7 +92,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        //throw new IllegalStateException("<---- Remove this line and set your keys below to use this sample !!");
+        // Initialize the Voxeet SDK
+        // WARNING: It is best practice to use the VoxeetSDK.initialize function with an Access Token to initialize the SDK.
+        // Please read the documentation at:
+        // https://dolby.io/developers/interactivity-apis/client-sdk/initializing
+        throw new IllegalStateException("<---- Remove this line and set your keys below to use this sample !!");
         VoxeetSDK.initialize("", "");
 
         //adding the user_name, login and logout views related to the open/close and conference flow
