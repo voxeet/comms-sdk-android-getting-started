@@ -30,11 +30,8 @@ import com.voxeet.sdk.json.internal.ParamsHolder;
 import com.voxeet.sdk.models.Conference;
 import com.voxeet.sdk.models.Participant;
 import com.voxeet.sdk.models.v1.CreateConferenceResult;
-<<<<<<< master
 import com.voxeet.sdk.services.builders.ConferenceCreateOptions;
-=======
 import com.voxeet.sdk.services.builders.ConferenceJoinOptions;
->>>>>>> master
 import com.voxeet.sdk.services.conference.information.ConferenceInformation;
 import com.voxeet.sdk.services.screenshare.RequestScreenSharePermissionEvent;
 import com.voxeet.sdk.views.VideoView;
