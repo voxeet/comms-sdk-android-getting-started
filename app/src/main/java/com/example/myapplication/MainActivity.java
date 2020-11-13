@@ -17,7 +17,7 @@ import com.voxeet.VoxeetSDK;
 import com.voxeet.android.media.MediaStream;
 import com.voxeet.android.media.stream.MediaStreamType;
 import com.voxeet.promise.solve.ErrorPromise;
-import com.voxeet.promise.solve.PromiseExec;
+import com.voxeet.promise.solve.ThenPromise;
 import com.voxeet.sdk.events.v2.ParticipantAddedEvent;
 import com.voxeet.sdk.events.v2.ParticipantUpdatedEvent;
 import com.voxeet.sdk.events.v2.StreamAddedEvent;
@@ -26,10 +26,11 @@ import com.voxeet.sdk.events.v2.StreamUpdatedEvent;
 import com.voxeet.sdk.events.promises.ServerErrorException;
 import com.voxeet.sdk.json.RecordingStatusUpdatedEvent;
 import com.voxeet.sdk.json.ParticipantInfo;
+import com.voxeet.sdk.json.internal.ParamsHolder;
 import com.voxeet.sdk.models.Conference;
 import com.voxeet.sdk.models.Participant;
 import com.voxeet.sdk.models.v1.CreateConferenceResult;
-import com.voxeet.sdk.services.builders.ConferenceJoinOptions;
+import com.voxeet.sdk.services.builders.ConferenceCreateOptions;
 import com.voxeet.sdk.services.conference.information.ConferenceInformation;
 import com.voxeet.sdk.services.screenshare.RequestScreenSharePermissionEvent;
 import com.voxeet.sdk.views.VideoView;
@@ -91,7 +92,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        //throw new IllegalStateException("<---- Remove this line and set your keys below to use this sample !!");
+        // Initialize the Voxeet SDK
+        // WARNING: It is best practice to use the VoxeetSDK.initialize function with an Access Token to initialize the SDK.
+        // Please read the documentation at:
+        // https://dolby.io/developers/interactivity-apis/client-sdk/initializing
+        throw new IllegalStateException("<---- Remove this line and set your keys below to use this sample !!");
         VoxeetSDK.initialize("", "");
 
         //adding the user_name, login and logout views related to the open/close and conference flow
@@ -259,18 +264,20 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.join)
     public void onJoin() {
-        VoxeetSDK.conference().create(conference_name.getText().toString())
-                .then((PromiseExec<CreateConferenceResult, Conference>) (result, solver) -> {
-                    VoxeetSDK.conference().fetchConference(result.conferenceId)
-                            .then( (conference) -> {
-                                ConferenceJoinOptions.Builder joinOptions = new ConferenceJoinOptions.Builder(conference);
-                                solver.resolve(VoxeetSDK.conference().join(joinOptions.build()));
-                            })
-                            .error(((error_in) -> {
-                                Toast.makeText(MainActivity.this, "Could not find conference", Toast.LENGTH_SHORT).show();
-                            }));
+        ParamsHolder paramsHolder = new ParamsHolder();
+        paramsHolder.setDolbyVoice(true);
+
+        ConferenceCreateOptions conferenceCreateOptions = new ConferenceCreateOptions.Builder()
+                .setConferenceAlias(conference_name.getText().toString())
+                .setParamsHolder(paramsHolder)
+                .build();
+
+        VoxeetSDK.conference().create(conferenceCreateOptions)
+                .then((ThenPromise<CreateConferenceResult, Conference>) res -> {
+                    Conference conference = VoxeetSDK.conference().getConference(res.conferenceId);
+                    return VoxeetSDK.conference().join(conference);
                 })
-                .then((result, solver) -> {
+                .then(conference -> {
                     Toast.makeText(MainActivity.this, "started...", Toast.LENGTH_SHORT).show();
                     updateViews();
                 })
