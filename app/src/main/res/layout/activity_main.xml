@@ -6,7 +6,7 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <!-- the samples will be populated here -->
+    <!-- Step 1. Put the layout changes for the open/close session step here -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -42,6 +42,9 @@
                 android:text="logout" />
         </LinearLayout>
     </LinearLayout>
+
+
+    <!-- Step 2. Put the layout changes for the join conference step here -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -63,14 +66,15 @@
             android:layout_height="wrap_content"
             android:text="start" />
 
+        <!-- Step 2.2. The layout will be upgraded in the leave conference step -->
+        <Button
+            android:id="@+id/leave"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="leave" />
     </LinearLayout>
-    <Button
-        android:id="@+id/leave"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="leave" />
-    <!-- Please put below the layout modification with the video step -->
 
+    <!-- Step 3. Put the layout changes for the video step here -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -81,28 +85,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="start video" />
+
+        <!-- Step 3.2. This layout will be upgraded in the stop video step -->
         <Button
             android:id="@+id/stopVideo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="stop video" />
 
-        <!-- Below will be put the block concerning the stop video functionnality -->
-
     </LinearLayout>
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="users :" />
 
-    <EditText
-        android:id="@+id/participants"
-        android:enabled="false"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="300dp">
 
         <LinearLayout
             android:layout_width="0dp"
@@ -125,7 +120,59 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
         </LinearLayout>
-
     </LinearLayout>
+
+    <!-- Step 4. Put the layout changes for the view participants step here -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="users :" />
+
+    <EditText
+        android:id="@+id/participants"
+        android:enabled="false"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <!-- Step 5. Put the layout changes for the screen sharing step here -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/startScreenShare"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="start screenshare" />
+
+        <!-- Step 5.2. This layout will be upgraded in the stop screen sharing step -->
+        <Button
+            android:id="@+id/stopScreenShare"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="stop screenshare" />
+    </LinearLayout>
+
+    <!-- Step 6. Put the layout changes for the recording step here -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/start_recording"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="start recording" />
+
+        <!-- Step 6.2 This layout will be upgraded in the stop recording step -->
+        <Button
+            android:id="@+id/stop_recording"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="stop recording" />
+    </LinearLayout>
+
 
 </LinearLayout>

@@ -1,6 +1,7 @@
 package com.example.myapplication;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -16,21 +17,26 @@ import com.voxeet.VoxeetSDK;
 import com.voxeet.android.media.MediaStream;
 import com.voxeet.android.media.stream.MediaStreamType;
 import com.voxeet.promise.solve.ErrorPromise;
-import com.voxeet.promise.solve.ThenPromise;
+import com.voxeet.promise.solve.PromiseExec;
 import com.voxeet.sdk.events.v2.ParticipantAddedEvent;
 import com.voxeet.sdk.events.v2.ParticipantUpdatedEvent;
 import com.voxeet.sdk.events.v2.StreamAddedEvent;
 import com.voxeet.sdk.events.v2.StreamRemovedEvent;
 import com.voxeet.sdk.events.v2.StreamUpdatedEvent;
+import com.voxeet.sdk.events.promises.ServerErrorException;
+import com.voxeet.sdk.json.RecordingStatusUpdatedEvent;
 import com.voxeet.sdk.json.ParticipantInfo;
 import com.voxeet.sdk.json.internal.ParamsHolder;
 import com.voxeet.sdk.models.Conference;
 import com.voxeet.sdk.models.Participant;
 import com.voxeet.sdk.models.v1.CreateConferenceResult;
+<<<<<<< master
 import com.voxeet.sdk.services.builders.ConferenceCreateOptions;
+=======
+import com.voxeet.sdk.services.builders.ConferenceJoinOptions;
+>>>>>>> master
 import com.voxeet.sdk.services.conference.information.ConferenceInformation;
-import com.voxeet.sdk.utils.Map;
-import com.voxeet.sdk.utils.Opt;
+import com.voxeet.sdk.services.screenshare.RequestScreenSharePermissionEvent;
 import com.voxeet.sdk.views.VideoView;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -38,6 +44,7 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -57,11 +64,22 @@ public class MainActivity extends AppCompatActivity {
     protected List<View> buttonsNotInConference = new ArrayList<>();
 
     @NonNull
-    @Bind(R.id.conference_name)
-    EditText conference_name;
+    protected List<View> buttonsInOwnVideo = new ArrayList<>();
+
+    @NonNull
+    protected List<View> buttonsNotInOwnVideo = new ArrayList<>();
+
+    @NonNull
+    protected List<View> buttonsInOwnScreenShare = new ArrayList<>();
+
+    @NonNull
+    protected List<View> buttonsNotInOwnScreenShare = new ArrayList<>();
 
     @Bind(R.id.user_name)
     EditText user_name;
+
+    @Bind(R.id.conference_name)
+    EditText conference_name;
 
     @Bind(R.id.video)
     protected VideoView video;
@@ -92,13 +110,64 @@ public class MainActivity extends AppCompatActivity {
 
         add(buttonsNotInConference, R.id.logout);
 
-        add(views, R.id.join);
+        String[] avengersNames = {
+                "Thor",
+                "Cap",
+                "Tony Stark",
+                "Black Panther",
+                "Black Widow",
+                "Hulk",
+                "Spider-Man",
+        };
+        Random r = new Random();
+        user_name.setText(avengersNames[r.nextInt(avengersNames.length)]);
 
+        // Add the join button and enable it only when not in a conference
+        add(views, R.id.join);
         add(buttonsNotInConference, R.id.join);
 
-        add(views, R.id.leave);
+        // Set a default conference name
+        conference_name.setText("Avengers meeting");
 
+        // Add the leave button and enable it only while in a conference
+        add(views, R.id.leave);
         add(buttonsInConference, R.id.leave);
+
+        //adding the startVideo in the flow
+        add(views, R.id.startVideo);
+        add(buttonsInConference, R.id.startVideo);
+        add(buttonsNotInOwnVideo, R.id.startVideo);
+
+        //adding the stopVideo in the flow
+        add(views, R.id.stopVideo);
+        add(buttonsInConference, R.id.stopVideo);
+        add(buttonsInOwnVideo, R.id.stopVideo);
+
+        //adding the startScreenShare in the flow
+        add(views, R.id.startScreenShare);
+        add(buttonsInConference, R.id.startScreenShare);
+        add(buttonsNotInOwnScreenShare, R.id.startScreenShare);
+
+        //adding the stopScreenShare in the flow
+        add(views, R.id.stopScreenShare);
+        add(buttonsInConference, R.id.stopScreenShare);
+        add(buttonsInOwnScreenShare, R.id.stopScreenShare);
+
+        //adding the start recording in the flow
+        add(views, R.id.start_recording);
+        add(buttonsInConference, R.id.start_recording);
+
+        //adding the stop recording in the flow
+        add(views, R.id.stop_recording);
+        add(buttonsInConference, R.id.stop_recording);
+    }
+
+    @Override
+    protected void onPause() {
+        //register the current activity in the SDK
+        VoxeetSDK.instance().unregister(this);
+
+        super.onPause();
     }
 
     @Override
@@ -107,13 +176,16 @@ public class MainActivity extends AppCompatActivity {
 
         updateViews();
 
+        //register the current activity in the SDK
+        VoxeetSDK.instance().register(this);
+
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED
                 ||
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA}, 0x20);
         }
 
-        VoxeetSDK.instance().register(this);
+        VoxeetSDK.screenShare().consumeRightsToScreenShare();
     }
 
     private MainActivity add(List<View> list, int id) {
@@ -139,6 +211,24 @@ public class MainActivity extends AppCompatActivity {
         } else {
             setEnabled(buttonsNotInConference, true);
         }
+        if (null != current) {
+            if (current.isOwnVideoStarted()) {
+                setEnabled(buttonsInOwnVideo, true);
+                setEnabled(buttonsNotInOwnVideo, false);
+            } else {
+                setEnabled(buttonsInOwnVideo, false);
+                setEnabled(buttonsNotInOwnVideo, true);
+            }
+        }
+        if (null != current) {
+            if (current.isScreenShareOn()) {
+                setEnabled(buttonsInOwnScreenShare, true);
+                setEnabled(buttonsNotInOwnScreenShare, false);
+            } else {
+                setEnabled(buttonsInOwnScreenShare, false);
+                setEnabled(buttonsNotInOwnScreenShare, true);
+            }
+        }
     }
 
     private ErrorPromise error() {
@@ -157,7 +247,7 @@ public class MainActivity extends AppCompatActivity {
     public void onLogin() {
         VoxeetSDK.session().open(new ParticipantInfo(user_name.getText().toString(), "", ""))
                 .then((result, solver) -> {
-                    Toast.makeText(MainActivity.this, "started...", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "log in successful", Toast.LENGTH_SHORT).show();
                     updateViews();
                 })
                 .error(error());
@@ -191,13 +281,18 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "started...", Toast.LENGTH_SHORT).show();
                     updateViews();
                 })
-                .error(error());
+                .error((error_in) -> {
+                    Toast.makeText(MainActivity.this, "Could not create conference", Toast.LENGTH_SHORT).show();
+                });
     }
 
     @OnClick(R.id.leave)
     public void onLeave() {
         VoxeetSDK.conference().leave()
-                .then((result, solver) -> updateViews()).error(error());
+                .then((result, solver) -> {
+                    updateViews();
+                    Toast.makeText(MainActivity.this, "left...", Toast.LENGTH_SHORT).show();
+                }).error(error());
     }
 
     @OnClick(R.id.startVideo)
@@ -217,26 +312,29 @@ public class MainActivity extends AppCompatActivity {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(StreamAddedEvent event) {
         updateStreams();
+        updateViews();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(StreamUpdatedEvent event) {
         updateStreams();
+        updateViews();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(StreamRemovedEvent event) {
         updateStreams();
+        updateViews();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(ParticipantAddedEvent event) {
-        updateUsers();
+        updateParticipants();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(ParticipantUpdatedEvent event) {
-        updateUsers();
+        updateParticipants();
     }
 
     private void updateStreams() {
@@ -251,12 +349,97 @@ public class MainActivity extends AppCompatActivity {
                 video.attach(user.getId(), stream);
             }
         }
+
+        // Screen shares take precedence over videos
+        for (Participant user : VoxeetSDK.conference().getParticipants()) {
+            boolean isLocal = user.getId().equals(VoxeetSDK.session().getParticipantId());
+            MediaStream stream = user.streamsHandler().getFirst(MediaStreamType.ScreenShare);
+
+            VideoView video = isLocal ? this.video : this.videoOther;
+
+            if (null != stream && !stream.videoTracks().isEmpty()) {
+                video.setVisibility(View.VISIBLE);
+                video.attach(user.getId(), stream);
+            }
+        }
     }
 
-    public void updateUsers() {
-        List<String> names = Map.map(VoxeetSDK.conference().getParticipants(), participant ->
-                Opt.of(participant.getInfo()).then(ParticipantInfo::getName).or(""));
+    public void updateParticipants() {
+        List<Participant> participantsList = VoxeetSDK.conference().getParticipants();
+        List<String> names = new ArrayList<>();
 
-        this.participants.setText(TextUtils.join(",", names));
+        for (Participant participant : participantsList) {
+            if (participant.streams().size() > 0)
+                names.add(participant.getInfo().getName());
+        }
+
+        participants.setText(TextUtils.join(", ", names));
+    }
+    @OnClick(R.id.startScreenShare)
+    public void onStartScreenShare() {
+        VoxeetSDK.screenShare().sendRequestStartScreenShare();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(RequestScreenSharePermissionEvent event) {
+        VoxeetSDK.screenShare().sendUserPermissionRequest(this);
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        boolean managed = false;
+
+        if (null != VoxeetSDK.screenShare()) {
+            managed = VoxeetSDK.screenShare().onActivityResult(requestCode, resultCode, data);
+        }
+
+        if (!managed) {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+        updateViews();
+    }
+
+    @OnClick(R.id.stopScreenShare)
+    public void onStopScreenShare() {
+        VoxeetSDK.screenShare().stopScreenShare().then((result, solver) -> {
+            //screenshare has been stopped locally and remotely
+            updateViews();
+        }).error(error -> {
+            //screenshare has been stopped locally but a network error occured
+        });
+    }
+
+    @OnClick(R.id.start_recording)
+    public void onStartRecording() {
+        VoxeetSDK.recording().start()
+                .then((result, solver) -> {
+                })
+                .error((error_in) -> {
+                    String error_message = "Error";
+                    if (((ServerErrorException)error_in).error.error_code == 303) {
+                        error_message = "Recording already started";
+                    }
+                    updateViews();
+                    Toast.makeText(MainActivity.this, error_message, Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(RecordingStatusUpdatedEvent event) {
+        String message = null;
+        switch (event.recordingStatus) {
+            case "RECORDING": message = "Recording started"; break;
+            case "NOT_RECORDING": message = "Recording stopped"; break;
+            default: break;
+        }
+        if (null != message)
+            Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    @OnClick(R.id.stop_recording)
+    public void onStopRecording() {
+        VoxeetSDK.recording().stop()
+                .then((result, solver) -> {
+                })
+                .error(error());
     }
 }

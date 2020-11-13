@@ -1,8 +1,8 @@
-# Getting Started with VoxeetSDK on Android
+# Dolby Interactivity APIs Android SDK Getting Started app
 
-This repository has the sample code explained in this guide:
-- [Create a Basic Audio Conference Application](https://dolby.io/developers/interactivity-apis/client-sdk/getting-started/create-a-basic-audio-conference-application)
+
+This is the sample app from the Android app used in the
+[Getting Started](https://dolby.io/developers/interactivity-apis/client-sdk/getting-started/create-a-basic-audio-conference-application) article. 
 
 You can find additional reference documentation here:
 - [Android Reference](https://dolby.io/developers/interactivity-apis/client-sdk/reference-android/voxeetsdk)
-
