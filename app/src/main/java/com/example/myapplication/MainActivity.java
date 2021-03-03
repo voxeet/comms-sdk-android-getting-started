@@ -29,8 +29,8 @@ import com.voxeet.sdk.json.ParticipantInfo;
 import com.voxeet.sdk.json.internal.ParamsHolder;
 import com.voxeet.sdk.models.Conference;
 import com.voxeet.sdk.models.Participant;
-import com.voxeet.sdk.models.v1.CreateConferenceResult;
 import com.voxeet.sdk.services.builders.ConferenceCreateOptions;
+import com.voxeet.sdk.services.builders.ConferenceJoinOptions;
 import com.voxeet.sdk.services.conference.information.ConferenceInformation;
 import com.voxeet.sdk.services.screenshare.RequestScreenSharePermissionEvent;
 import com.voxeet.sdk.views.VideoView;
@@ -273,9 +273,11 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
         VoxeetSDK.conference().create(conferenceCreateOptions)
-                .then((ThenPromise<CreateConferenceResult, Conference>) res -> {
-                    Conference conference = VoxeetSDK.conference().getConference(res.conferenceId);
-                    return VoxeetSDK.conference().join(conference);
+                .then((ThenPromise<Conference, Conference>) conference -> {
+                    ConferenceJoinOptions conferenceJoinOptions = new ConferenceJoinOptions.Builder(conference)
+                            .build();
+
+                    return VoxeetSDK.conference().join(conferenceJoinOptions);
                 })
                 .then(conference -> {
                     Toast.makeText(MainActivity.this, "started...", Toast.LENGTH_SHORT).show();
