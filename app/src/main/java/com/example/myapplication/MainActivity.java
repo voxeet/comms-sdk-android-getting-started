@@ -33,6 +33,7 @@ import com.voxeet.sdk.services.builders.ConferenceCreateOptions;
 import com.voxeet.sdk.services.builders.ConferenceJoinOptions;
 import com.voxeet.sdk.services.conference.information.ConferenceInformation;
 import com.voxeet.sdk.services.screenshare.RequestScreenSharePermissionEvent;
+import com.voxeet.sdk.services.screenshare.ScreenCapturerService;
 import com.voxeet.sdk.views.VideoView;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -162,6 +163,11 @@ public class MainActivity extends AppCompatActivity {
         add(buttonsInConference, R.id.stop_recording);
     }
 
+    private MainActivity add(List<View> list, int id) {
+        list.add(findViewById(id));
+        return this;
+    }
+
     @Override
     protected void onPause() {
         //register the current activity in the SDK
@@ -173,6 +179,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        ScreenCapturerService.register(this);
 
         updateViews();
 
@@ -188,9 +196,11 @@ public class MainActivity extends AppCompatActivity {
         VoxeetSDK.screenShare().consumeRightsToScreenShare();
     }
 
-    private MainActivity add(List<View> list, int id) {
-        list.add(findViewById(id));
-        return this;
+    @Override
+    protected void onDestroy() {
+        ScreenCapturerService.unregisterActivity();
+
+        super.onDestroy();
     }
 
     private void updateViews() {
