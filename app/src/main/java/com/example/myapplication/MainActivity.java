@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
         // Initialize the Voxeet SDK
         // WARNING: It is best practice to use the VoxeetSDK.initialize function with an Access Token to initialize the SDK.
         // Please read the documentation at:
-        // https://docs.dolby.io/interactivity/docs/guides-security-best-practices#authentication
+        // https://docs.dolby.io/interactivity/docs/initializing
         throw new IllegalStateException("<---- Remove this line and set your keys below to use this sample !!");
         VoxeetSDK.initialize("", "");
 
