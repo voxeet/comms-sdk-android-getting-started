@@ -36,6 +36,4 @@ dependencies {
     implementation ("com.voxeet.sdk:sdk:3.2.1") {
         transitive = true
     }
-    implementation 'com.jakewharton:butterknife:7.0.1'
-    annotationProcessor 'com.jakewharton:butterknife:7.0.1'
 }

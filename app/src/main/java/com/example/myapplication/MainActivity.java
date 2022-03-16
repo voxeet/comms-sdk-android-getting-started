@@ -354,6 +354,7 @@ public class MainActivity extends AppCompatActivity {
     public void onJoin() {
         ParamsHolder paramsHolder = new ParamsHolder();
         paramsHolder.setDolbyVoice(true);
+        paramsHolder.setVideoCodec("VP8");
 
         ConferenceCreateOptions conferenceCreateOptions = new ConferenceCreateOptions.Builder()
                 .setConferenceAlias(binding.conferenceName.getText().toString())
