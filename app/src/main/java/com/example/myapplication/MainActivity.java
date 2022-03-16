@@ -80,16 +80,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        View view = binding.getRoot();
+        setContentView(view);
         // Initialize the Voxeet SDK
         // WARNING: It is best practice to use the VoxeetSDK.initialize function with an Access Token to initialize the SDK.
         // Please read the documentation at:
         // https://docs.dolby.io/interactivity/docs/initializing
-
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
-        View view = binding.getRoot();
-        setContentView(view);
 
         binding.login.setOnClickListener(new View.OnClickListener() {
             @Override
