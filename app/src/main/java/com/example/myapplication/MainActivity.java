@@ -427,7 +427,7 @@ public class MainActivity extends AppCompatActivity {
             boolean isLocal = user.getId().equals(VoxeetSDK.session().getParticipantId());
             MediaStream stream = user.streamsHandler().getFirst(MediaStreamType.Camera);
 
-            VideoView video = isLocal ? this.video : this.videoOther;
+            VideoView video = isLocal ? this.binding.video : this.binding.videoOther;
 
             if (null != stream && !stream.videoTracks().isEmpty()) {
                 video.setVisibility(View.VISIBLE);
