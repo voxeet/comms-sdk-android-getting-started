@@ -5,9 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -20,14 +18,14 @@ import com.voxeet.android.media.MediaStream;
 import com.voxeet.android.media.stream.MediaStreamType;
 import com.voxeet.promise.solve.ErrorPromise;
 import com.voxeet.promise.solve.ThenPromise;
+import com.voxeet.sdk.events.promises.ServerErrorException;
 import com.voxeet.sdk.events.v2.ParticipantAddedEvent;
 import com.voxeet.sdk.events.v2.ParticipantUpdatedEvent;
 import com.voxeet.sdk.events.v2.StreamAddedEvent;
 import com.voxeet.sdk.events.v2.StreamRemovedEvent;
 import com.voxeet.sdk.events.v2.StreamUpdatedEvent;
-import com.voxeet.sdk.events.promises.ServerErrorException;
-import com.voxeet.sdk.json.RecordingStatusUpdatedEvent;
 import com.voxeet.sdk.json.ParticipantInfo;
+import com.voxeet.sdk.json.RecordingStatusUpdatedEvent;
 import com.voxeet.sdk.json.internal.ParamsHolder;
 import com.voxeet.sdk.models.Conference;
 import com.voxeet.sdk.models.Participant;
@@ -73,10 +71,6 @@ public class MainActivity extends AppCompatActivity {
     @NonNull
     protected List<View> buttonsNotInOwnScreenShare = new ArrayList<>();
 
-    protected VideoView video;
-
-    protected VideoView videoOther;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,7 +85,6 @@ public class MainActivity extends AppCompatActivity {
         binding.login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d("MainActivity", "Login");
                 onLogin();
             }
         });
@@ -99,7 +92,6 @@ public class MainActivity extends AppCompatActivity {
         binding.logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d("MainActivity", "Logout");
                 onLogout();
             }
         });
@@ -107,7 +99,6 @@ public class MainActivity extends AppCompatActivity {
         binding.join.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d(TAG, "Join");
                 onJoin();
             }
         });
@@ -115,7 +106,6 @@ public class MainActivity extends AppCompatActivity {
         binding.leave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d(TAG, "Leave");
                 onLeave();
             }
         });
@@ -123,7 +113,6 @@ public class MainActivity extends AppCompatActivity {
         binding.startVideo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d(TAG, "Start video");
                 onStartVideo();
             }
         });
@@ -131,7 +120,6 @@ public class MainActivity extends AppCompatActivity {
         binding.stopVideo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d(TAG, "Stop video");
                 onStopVideo();
             }
         });
@@ -139,7 +127,6 @@ public class MainActivity extends AppCompatActivity {
         binding.startVideo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d(TAG, "Start video");
                 onStartVideo();
             }
         });
@@ -147,7 +134,6 @@ public class MainActivity extends AppCompatActivity {
         binding.startScreenShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d(TAG, "Start screen share");
                 onStartScreenShare();
             }
         });
@@ -155,7 +141,6 @@ public class MainActivity extends AppCompatActivity {
         binding.stopScreenShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d(TAG, "Stop screen share");
                 onStopScreenShare();
             }
         });
@@ -163,7 +148,6 @@ public class MainActivity extends AppCompatActivity {
         binding.startRecording.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d(TAG, "Start recording");
                 onStartRecording();
             }
         });
@@ -171,7 +155,6 @@ public class MainActivity extends AppCompatActivity {
         binding.stopRecording.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d(TAG, "Stop recording");
                 onStopRecording();
             }
         });
@@ -440,7 +423,7 @@ public class MainActivity extends AppCompatActivity {
             boolean isLocal = user.getId().equals(VoxeetSDK.session().getParticipantId());
             MediaStream stream = user.streamsHandler().getFirst(MediaStreamType.ScreenShare);
 
-            VideoView video = isLocal ? this.video : this.videoOther;
+            VideoView video = isLocal ? this.binding.video : this.binding.videoOther;
 
             if (null != stream && !stream.videoTracks().isEmpty()) {
                 video.setVisibility(View.VISIBLE);
@@ -499,7 +482,7 @@ public class MainActivity extends AppCompatActivity {
                 })
                 .error((error_in) -> {
                     String error_message = "Error";
-                    if (((ServerErrorException)error_in).error.error_code == 303) {
+                    if (((ServerErrorException) error_in).error.error_code == 303) {
                         error_message = "Recording already started";
                     }
                     updateViews();
@@ -511,9 +494,14 @@ public class MainActivity extends AppCompatActivity {
     public void onEvent(RecordingStatusUpdatedEvent event) {
         String message = null;
         switch (event.recordingStatus) {
-            case "RECORDING": message = "Recording started"; break;
-            case "NOT_RECORDING": message = "Recording stopped"; break;
-            default: break;
+            case "RECORDING":
+                message = "Recording started";
+                break;
+            case "NOT_RECORDING":
+                message = "Recording stopped";
+                break;
+            default:
+                break;
         }
         if (null != message)
             Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
