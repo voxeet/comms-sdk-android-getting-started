@@ -80,6 +80,8 @@ public class MainActivity extends AppCompatActivity {
         // WARNING: It is best practice to use the VoxeetSDK.initialize function with an Access Token to initialize the SDK.
         // Please read the documentation at:
         // https://docs.dolby.io/interactivity/docs/initializing
+        throw new IllegalStateException("<---- Remove this line and set your keys below to use this sample !!");
+        VoxeetSDK.initialize("", "");
 
         binding.login.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -157,8 +159,6 @@ public class MainActivity extends AppCompatActivity {
                 onStopRecording();
             }
         });
-
-        VoxeetSDK.initialize("uXnZGxjWT5tMyQ2qNVyTMg==", "LwE9yIpoSmGPQrSYqwB09Z9onXob6MM3hRcIBYx_qMc=");
 
         //adding the user_name, login and logout views related to the open/close and conference flow
         add(views, R.id.login);
