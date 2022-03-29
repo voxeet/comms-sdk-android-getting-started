@@ -269,7 +269,7 @@ public class MainActivity extends AppCompatActivity {
         setEnabled(views, false);
 
         //if the user is not connected, we will only enabled the not logged
-        if (!VoxeetSDK.session().isSocketOpen()) {
+        if (!VoxeetSDK.session().isOpen()) {
             setEnabled(buttonsNotLoggedIn, true);
             return;
         }
