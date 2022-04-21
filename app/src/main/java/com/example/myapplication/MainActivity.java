@@ -79,9 +79,9 @@ public class MainActivity extends AppCompatActivity {
         // Initialize the Voxeet SDK
         // Please read the documentation at:
         // https://docs.dolby.io/interactivity/docs/initializing
-        // Grab your demos client access token from your dashboard and insert into accessToken variable
+        // Generate a test client access token from the Dolby.io dashboard and insert into accessToken variable
         throw new IllegalStateException("<---- Remove this line and set your demos key below to use this sample !!");
-        String accessToken = "<INSERT DEMOS CLIENT ACCESS TOKEN HERE>";
+        String accessToken = "TestClientAccessToken";
         VoxeetSDK.initialize(accessToken, (b, tokenCallback) -> {
             tokenCallback.ok(accessToken);
         });
