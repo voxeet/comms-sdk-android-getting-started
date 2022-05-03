@@ -128,13 +128,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        binding.startVideo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onStartVideo();
-            }
-        });
-
         binding.startScreenShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
