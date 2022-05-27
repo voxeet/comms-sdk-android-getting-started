@@ -76,12 +76,13 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
+
         // Initialize the Voxeet SDK
         // Please read the documentation at:
-        // https://docs.dolby.io/interactivity/docs/initializing
-        // Generate a test client access token from the Dolby.io dashboard and insert into accessToken variable
-        throw new IllegalStateException("<---- Remove this line and set your demos key below to use this sample !!");
-        String accessToken = "TestClientAccessToken";
+        // https://docs.dolby.io/communications-apis/docs/initializing-javascript
+        // Generate a client access token from the Dolby.io dashboard and insert into accessToken variable
+        throw new IllegalStateException("<---- Remove this line and set your client access token below to use this sample!");
+        String accessToken = "ClientAccessToken";
         VoxeetSDK.initialize(accessToken, (b, tokenCallback) -> {
             tokenCallback.ok(accessToken);
         });
