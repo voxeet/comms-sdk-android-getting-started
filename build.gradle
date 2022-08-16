@@ -3,7 +3,7 @@
 buildscript {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
         
     }
     dependencies {
@@ -17,9 +17,14 @@ buildscript {
 allprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
 
-        maven { url "https://android-sdk.voxeet.com/release" }
+        maven {
+            url "https://android-sdk.voxeet.com/release"
+            content {
+                includeGroup "com.voxeet.sdk"
+            }
+        }
     }
 }
 
