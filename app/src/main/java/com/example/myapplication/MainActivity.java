@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
         View view = binding.getRoot();
         setContentView(view);
 
-        // Initialize the Voxeet SDK
+        // Initialize the Dolby.io Communications SDK for Android
         // Please read the documentation at:
         // https://docs.dolby.io/communications-apis/docs/initializing-javascript
         // Generate a client access token from the Dolby.io dashboard and insert into accessToken variable
