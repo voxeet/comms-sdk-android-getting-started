@@ -362,13 +362,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onStartVideo() {
-        VoxeetSDK.conference().startVideo()
+        VoxeetSDK.video().getLocal().start()
                 .then((result, solver) -> updateViews())
                 .error(error());
     }
 
     public void onStopVideo() {
-        VoxeetSDK.conference().stopVideo()
+        VoxeetSDK.video().getLocal().stop()
                 .then((result, solver) -> updateViews())
                 .error(error());
     }
@@ -478,7 +478,7 @@ public class MainActivity extends AppCompatActivity {
                 })
                 .error((error_in) -> {
                     String error_message = "Error";
-                    if (((ServerErrorException) error_in).error.error_code == 303) {
+                    if (((ServerErrorException) error_in).error.errorCode == 303) {
                         error_message = "Recording already started";
                     }
                     updateViews();
