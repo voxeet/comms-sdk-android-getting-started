@@ -87,75 +87,16 @@ public class MainActivity extends AppCompatActivity {
             tokenCallback.ok(accessToken);
         });
 
-        binding.login.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onLogin();
-            }
-        });
-
-        binding.logout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onLogout();
-            }
-        });
-
-        binding.join.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onJoin();
-            }
-        });
-
-        binding.leave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onLeave();
-            }
-        });
-
-        binding.startVideo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onStartVideo();
-            }
-        });
-
-        binding.stopVideo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onStopVideo();
-            }
-        });
-
-        binding.startScreenShare.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onStartScreenShare();
-            }
-        });
-
-        binding.stopScreenShare.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onStopScreenShare();
-            }
-        });
-
-        binding.startRecording.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onStartRecording();
-            }
-        });
-
-        binding.stopRecording.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onStopRecording();
-            }
-        });
+        binding.login.setOnClickListener(_view -> onLogin());
+        binding.logout.setOnClickListener(_view -> onLogout());
+        binding.join.setOnClickListener(_view -> onJoin());
+        binding.leave.setOnClickListener(_view -> onLeave());
+        binding.startVideo.setOnClickListener(_view -> onStartVideo());
+        binding.stopVideo.setOnClickListener(_view -> onStopVideo());
+        binding.startScreenShare.setOnClickListener(_view -> onStartScreenShare());
+        binding.stopScreenShare.setOnClickListener(_view -> onStopScreenShare());
+        binding.startRecording.setOnClickListener(_view -> onStartRecording());
+        binding.stopRecording.setOnClickListener(_view -> onStopRecording());
 
         //adding the user_name, login and logout views related to the open/close and conference flow
         add(views, R.id.login);
@@ -220,9 +161,8 @@ public class MainActivity extends AppCompatActivity {
         add(buttonsInConference, R.id.stop_recording);
     }
 
-    private MainActivity add(List<View> list, int id) {
+    private void add(List<View> list, int id) {
         list.add(findViewById(id));
-        return this;
     }
 
     @Override
@@ -362,13 +302,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onStartVideo() {
-        VoxeetSDK.conference().startVideo()
+        VoxeetSDK.video().getLocal().start()
                 .then((result, solver) -> updateViews())
                 .error(error());
     }
 
     public void onStopVideo() {
-        VoxeetSDK.conference().stopVideo()
+        VoxeetSDK.video().getLocal().stop()
                 .then((result, solver) -> updateViews())
                 .error(error());
     }
@@ -465,10 +405,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void onStopScreenShare() {
         VoxeetSDK.screenShare().stopScreenShare().then((result, solver) -> {
-            //screenshare has been stopped locally and remotely
+            // screen share has been stopped locally and remotely
             updateViews();
         }).error(error -> {
-            //screenshare has been stopped locally but a network error occured
+            // screen share has been stopped locally but a network error occurred
         });
     }
 
@@ -478,7 +418,7 @@ public class MainActivity extends AppCompatActivity {
                 })
                 .error((error_in) -> {
                     String error_message = "Error";
-                    if (((ServerErrorException) error_in).error.error_code == 303) {
+                    if (((ServerErrorException) error_in).error.errorCode == 303) {
                         error_message = "Recording already started";
                     }
                     updateViews();
