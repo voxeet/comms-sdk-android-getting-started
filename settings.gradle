@@ -1,2 +1,2 @@
 include ':app'
-rootProject.name='Voxeet Application'
+rootProject.name='Dolby.io Application'
